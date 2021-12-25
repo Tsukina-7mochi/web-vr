@@ -44,6 +44,10 @@ module.exports = {
             },
           }
         ],
+      },
+      {
+        test: /.ts$/,
+        use: 'ts-loader'
       }
     ]
   },
@@ -61,6 +65,9 @@ module.exports = {
       ],
     }),
   ],
+  resolve: {
+    extensions: ['.js', '.ts']
+  },
   stats: {
     builtAt: true,
     errorsCount: true,
