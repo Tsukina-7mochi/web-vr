@@ -41,13 +41,15 @@ const projectCoord = (coord: coord, focusDistance: number): coord => ({
 });
 
 // 直線と平面z=0との交点を計算
-const calculateBoundaryIntersectionZ = (p1: coord, p2: coord): coord | null => {
-  if(p1.c == 0 && p2.c == 0) {
+const calculateBoundaryIntersectionZ = (p1: coord, p2: coord, infiniteDividerThreshold: number): coord | null => {
+  if(Math.abs(p1.c) < infiniteDividerThreshold && Math.abs(p2.c) < infiniteDividerThreshold) {
     // 両方無限遠点
     return null;
-  } else if(p1.c == 0) {
+  } else if(Math.abs(p1.c) < infiniteDividerThreshold) {
     // p1が無限遠点
     const t = - p2.z / p1.z;
+
+    console.log('t: ', t);
 
     return {
       x: p2.x + p1.x * t,
@@ -55,7 +57,7 @@ const calculateBoundaryIntersectionZ = (p1: coord, p2: coord): coord | null => {
       z: p2.z + p1.z * t,
       c: p2.c
     };
-  } else if(p2.c == 0) {
+  } else if(Math.abs(p2.c) < infiniteDividerThreshold) {
     // p2が無限遠点
     const t = - p1.z / p2.z;
 
@@ -155,30 +157,41 @@ class Renderer {
           startCamCoord.x *= -1;
           startCamCoord.y *= -1;
           startCamCoord.z *= -1;
-          startCamCoord.z *= -1;
+          startCamCoord.c *= -1;
         }
         if(endCamCoord.c < 0) {
           endCamCoord.x *= -1;
           endCamCoord.y *= -1;
           endCamCoord.z *= -1;
-          endCamCoord.z *= -1;
+          endCamCoord.c *= -1;
         }
 
         if(startCamCoord.z <= 0 && endCamCoord.z <= 0) {
           // 両方の点が描画範囲外
           continue;
-        } else if(startCamCoord.z <= 0) {
-          // 始点が描画範囲外
-          const bndCoord = calculateBoundaryIntersectionZ(startCamCoord, endCamCoord);
-          if(bndCoord === null) continue;
+        } else {
+          // 直線がz軸と平行かを調べる
+          // 両方の点が無限遠点以外の点でz軸と並行である場合はif節で排除されている
+          // そのためどちらかが無限遠点でz成分が0であればz=0と平行だとわかる
+          if((startCamCoord.c < this.screen.infiniteDividerThreshold && Math.abs(startCamCoord.z) < this.screen.infiniteDividerThreshold) ||
+             (endCamCoord.c   < this.screen.infiniteDividerThreshold && Math.abs(endCamCoord.z)   < this.screen.infiniteDividerThreshold)) {
+            // do nothing
+          } else {
+            // 平面z=0と平行でない場合、平面z=0との交点を求めて描画範囲外の座標と置き換え
+            if(startCamCoord.z <= 0) {
+              // 始点が描画範囲外
+              const bndCoord = calculateBoundaryIntersectionZ(startCamCoord, endCamCoord, this.screen.infiniteDividerThreshold);
+              if(bndCoord === null) continue;
 
-          startCamCoord = bndCoord;
-        } else if(endCamCoord.z <= 0) {
-          // 終点が描画範囲外
-          const bndCoord = calculateBoundaryIntersectionZ(startCamCoord, endCamCoord);
-          if(bndCoord === null) continue;
+              startCamCoord = bndCoord;
+            } else if(endCamCoord.z <= 0) {
+              // 終点が描画範囲外
+              const bndCoord = calculateBoundaryIntersectionZ(startCamCoord, endCamCoord, this.screen.infiniteDividerThreshold);
+                if(bndCoord === null) continue;
 
-          endCamCoord = bndCoord;
+                endCamCoord = bndCoord;
+            }
+          }
         }
 
         console.log('intersected: ', startCamCoord, endCamCoord);

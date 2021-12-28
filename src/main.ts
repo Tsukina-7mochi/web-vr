@@ -136,13 +136,16 @@ window.addEventListener('load', () => {
   }
   const renderer = new Renderer(outputScreen, 720, 480);
 
+  console.log(worldGrid);
+  console.log(cube);
+
   renderer.camera.coord.y = 10;
   renderer.camera.coord.z = 0;
   renderer.camera.focusDistance = 510;
 
   const render = function(): void {
     renderer.render(worldGrid);
-    renderer.render(cube, true);
+    // renderer.render(cube, true);
   }
 
   const elCamX = document.querySelector<HTMLInputElement>('div#control input#cam_x');
