@@ -10,6 +10,7 @@
 <body>
   <main>
     <div id="screen"></div>
+
     <div id="control">
       <div id="transform">
         <label for="cam_x">cam-x</label>
@@ -32,6 +33,27 @@
         <label for="rot_z">rot-z</label>
         <input type="range" id="rot_z" min = "-1" max = "1" step="0.01" value="0">
       </div>
+    </div>
+
+    <div id="sensor_information">
+      <div id="device_orientation_available"></div>
+      <div id="device_orientation_detected">The device orientation event is not detected</div>
+      <table>
+        <tbody>
+          <tr>
+            <td>Alpha</td>
+            <td id="device_orientation_alpha"></td>
+          </tr>
+          <tr>
+            <td>Beta</td>
+            <td id="device_orientation_beta"></td>
+          </tr>
+          <tr>
+            <td>Gamma</td>
+            <td id="device_orientation_gamma"></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </main>
 </body>

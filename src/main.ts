@@ -158,29 +158,93 @@ window.addEventListener('load', () => {
   const elRotY = document.querySelector<HTMLInputElement>('input#rot_y');
   const elRotZ = document.querySelector<HTMLInputElement>('input#rot_z');
 
-  elCamX?.addEventListener('change', () => {
+  if(elCamX === null) {
+    throw Error('elCamX is null');
+  }
+  if(elCamY === null) {
+    throw Error('elCamY is null');
+  }
+  if(elCamZ === null) {
+    throw Error('elCamZ is null');
+  }
+  if(elRotX === null) {
+    throw Error('elRotx is null');
+  }
+  if(elRotY === null) {
+    throw Error('elRotY is null');
+  }
+  if(elRotZ === null) {
+    throw Error('elRotZ is null');
+  }
+
+  elCamX.addEventListener('change', () => {
     renderer.camera.coord.x = parseFloat(elCamX.value);
     render();
   });
-  elCamY?.addEventListener('change', () => {
+  elCamY.addEventListener('change', () => {
     renderer.camera.coord.y = parseFloat(elCamY.value);
 
     render();
   });
-  elCamZ?.addEventListener('change', () => {
+  elCamZ.addEventListener('change', () => {
     renderer.camera.coord.z = parseFloat(elCamZ.value);
     render();
   });
-  elRotX?.addEventListener('input', () => {
+  elRotX.addEventListener('input', () => {
     renderer.camera.rotation.x = parseFloat(elRotX.value) * Math.PI;
     render();
   });
-  elRotY?.addEventListener('input', () => {
+  elRotY.addEventListener('input', () => {
     renderer.camera.rotation.y = parseFloat(elRotY.value) * Math.PI;
     render();
   });
-  elRotZ?.addEventListener('input', () => {
+  elRotZ.addEventListener('input', () => {
     renderer.camera.rotation.z = parseFloat(elRotZ.value) * Math.PI;
     render();
+  });
+
+  // デバイスの姿勢の検出
+  const elDeviceOrientationAvailable = document.querySelector<HTMLDivElement>('#device_orientation_available');
+  const elDeviceOrientationDetected = document.querySelector<HTMLDivElement>('#device_orientation_detected');
+  const elDeviceOrientationAlpha = document.querySelector<HTMLTableCellElement>('#device_orientation_alpha');
+  const elDeviceOrientationBeta  = document.querySelector<HTMLTableCellElement>('#device_orientation_beta');
+  const elDeviceOrientationGamma = document.querySelector<HTMLTableCellElement>('#device_orientation_gamma');
+
+  if(elDeviceOrientationAvailable === null) {
+    throw Error('elDeviceOrientationAvailable is null');
+  }
+  if(elDeviceOrientationDetected === null) {
+    throw Error('elDeviceOrientationDetected is null');
+  }
+  if(elDeviceOrientationAlpha === null) {
+    throw Error('elDeviceOrientationAlpha is null');
+  }
+  if(elDeviceOrientationBeta === null) {
+    throw Error('elDeviceOrientationBeta is null');
+  }
+  if(elDeviceOrientationGamma === null) {
+    throw Error('elDeviceOrientationGamma is null');
+  }
+
+  if(window.DeviceOrientationEvent) {
+    elDeviceOrientationAvailable.textContent = 'The device orientation is available.';
+  } else {
+    elDeviceOrientationAvailable.textContent = 'The device orientation is not available.';
+  }
+
+  window.addEventListener('deviceorientation', (e) => {
+    elDeviceOrientationDetected.textContent = 'The device orientation event detected';
+    elDeviceOrientationAlpha.textContent = '' + e.alpha;
+    elDeviceOrientationBeta. textContent = '' + e.beta;
+    elDeviceOrientationGamma.textContent = '' + e.gamma;
+
+    if(e.absolute) {
+      // そのまま使う
+    } else {
+      // 変換
+      if(typeof(e.alpha) === 'number' && typeof(e.beta) === 'number' && typeof(e.gamma) === 'number') {
+        //
+      }
+    }
   });
 });
