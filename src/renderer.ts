@@ -3,11 +3,11 @@ import type { coord, rotation, line } from './types';
 // 座標をワールド座標系からカメラ座標系に変換
 const transformToCamCoord = (coord: coord, cameraCoord: coord, cameraRotation: rotation): coord => {
   const cosX = Math.cos(cameraRotation.x);
-  const sinX = Math.sin(cameraRotation.x);
+  const sinX = -Math.sin(cameraRotation.x);
   const cosY = Math.cos(cameraRotation.y);
-  const sinY = Math.sin(cameraRotation.y);
+  const sinY = -Math.sin(cameraRotation.y);
   const cosZ = Math.cos(cameraRotation.z);
-  const sinZ = Math.sin(cameraRotation.z);
+  const sinZ = -Math.sin(cameraRotation.z);
 
   // カメラ座標の逆向きに並進
   const transformed = {
@@ -17,19 +17,32 @@ const transformToCamCoord = (coord: coord, cameraCoord: coord, cameraRotation: r
     c: coord.c
   };
 
-  // x軸の周りにカメラの回転と逆向きに回転
-  transformed.y =   cosX * transformed.y + sinX * transformed.z;
-  transformed.z = - sinX * transformed.y + cosX * transformed.z;
+  // 回転行列
+  const rotMatrix = [
+    [
+        cosZ * cosY,
+      - sinZ * cosX + cosZ * sinY * sinX,
+        sinZ * sinX + cosZ * sinY * cosX,
+    ],
+    [
+        sinZ * cosY,
+        cosZ * cosX + sinZ * sinY * sinX,
+      - cosZ * sinX + sinZ * sinY * cosX,
+    ],
+    [
+      - sinY,
+        cosY * sinX,
+        cosY * cosX,
+    ],
+  ]
 
-  // y軸
-  transformed.x =   cosY * transformed.x - sinY * transformed.z;
-  transformed.z =   sinY * transformed.x + cosY * transformed.z;
-
-  // z軸
-  transformed.x =   cosZ * transformed.x + sinZ * transformed.y;
-  transformed.y = - sinZ * transformed.x + cosZ * transformed.y;
-
-  return transformed;
+  // 回転
+  return {
+    x: transformed.x * rotMatrix[0][0] + transformed.y * rotMatrix[0][1] + transformed.z * rotMatrix[0][2],
+    y: transformed.x * rotMatrix[1][0] + transformed.y * rotMatrix[1][1] + transformed.z * rotMatrix[1][2],
+    z: transformed.x * rotMatrix[2][0] + transformed.y * rotMatrix[2][1] + transformed.z * rotMatrix[2][2],
+    c: transformed.c
+  }
 }
 
 // カメラ座標をスクリーンに投影
