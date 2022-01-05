@@ -126,7 +126,7 @@ const worldGrid: line[] = [
 
 const cube = [
   ...createCube({ x: 0, y: 0, z: 50, c: 1 }, 10, { r: 0xFF, g: 0, b: 0, a: 1 }, 1),
-  ...createCube({ x: 50, y: 0, z: 0, c: 1 }, 10, { r: 0xFF, g: 0, b: 0, a: 1 }, 1)
+  ...createCube({ x: 50, y: 0, z: 0, c: 1 }, 10, { r: 0, g: 0, b: 0xFF, a: 1 }, 1)
 ];
 
 window.addEventListener('load', () => {
@@ -145,15 +145,18 @@ window.addEventListener('load', () => {
 
   const render = function(): void {
     renderer.render(worldGrid);
-    // renderer.render(cube, true);
+    renderer.render(cube, true);
   }
 
-  const elCamX = document.querySelector<HTMLInputElement>('div#control input#cam_x');
-  const elCamY = document.querySelector<HTMLInputElement>('div#control input#cam_y');
-  const elCamZ = document.querySelector<HTMLInputElement>('div#control input#cam_z');
-  const elRotX = document.querySelector<HTMLInputElement>('div#control input#rot_x');
-  const elRotY = document.querySelector<HTMLInputElement>('div#control input#rot_y');
-  const elRotZ = document.querySelector<HTMLInputElement>('div#control input#rot_z');
+  render();
+
+  // DOMの設定
+  const elCamX = document.querySelector<HTMLInputElement>('input#cam_x');
+  const elCamY = document.querySelector<HTMLInputElement>('input#cam_y');
+  const elCamZ = document.querySelector<HTMLInputElement>('input#cam_z');
+  const elRotX = document.querySelector<HTMLInputElement>('input#rot_x');
+  const elRotY = document.querySelector<HTMLInputElement>('input#rot_y');
+  const elRotZ = document.querySelector<HTMLInputElement>('input#rot_z');
 
   elCamX?.addEventListener('change', () => {
     renderer.camera.coord.x = parseFloat(elCamX.value);
@@ -180,6 +183,4 @@ window.addEventListener('load', () => {
     renderer.camera.rotation.z = parseFloat(elRotZ.value) * Math.PI;
     render();
   });
-
-  render();
 });
