@@ -1,14 +1,8 @@
-import type { coord, rotation, line } from './types';
+import type { coord, line, rotMatrix } from './types';
+import { calculateRotMatrixFromFixedAngleXYZ } from './rotationUtils';
 
 // 座標をワールド座標系からカメラ座標系に変換
-const transformToCamCoord = (coord: coord, cameraCoord: coord, cameraRotation: rotation): coord => {
-  const cosX = Math.cos(cameraRotation.x);
-  const sinX = -Math.sin(cameraRotation.x);
-  const cosY = Math.cos(cameraRotation.y);
-  const sinY = -Math.sin(cameraRotation.y);
-  const cosZ = Math.cos(cameraRotation.z);
-  const sinZ = -Math.sin(cameraRotation.z);
-
+const transformToCamCoord = (coord: coord, cameraCoord: coord, rotMatrix: rotMatrix): coord => {
   // カメラ座標の逆向きに並進
   const transformed = {
     x: coord.x - cameraCoord.x * coord.c,
@@ -16,25 +10,6 @@ const transformToCamCoord = (coord: coord, cameraCoord: coord, cameraRotation: r
     z: coord.z - cameraCoord.z * coord.c,
     c: coord.c
   };
-
-  // 回転行列
-  const rotMatrix = [
-    [
-        cosZ * cosY,
-      - sinZ * cosX + cosZ * sinY * sinX,
-        sinZ * sinX + cosZ * sinY * cosX,
-    ],
-    [
-        sinZ * cosY,
-        cosZ * cosX + sinZ * sinY * sinX,
-      - cosZ * sinX + sinZ * sinY * cosX,
-    ],
-    [
-      - sinY,
-        cosY * sinX,
-        cosY * cosX,
-    ],
-  ]
 
   // 回転
   return {
@@ -97,7 +72,7 @@ class Renderer {
   ctx: CanvasRenderingContext2D;
   camera: {
     coord: coord,
-    rotation: rotation,
+    rotation: rotMatrix,
     focusDistance: number,
   };
   screen: {
@@ -125,11 +100,11 @@ class Renderer {
         z: 0,
         c: 1,
       },
-      rotation: {
+      rotation: calculateRotMatrixFromFixedAngleXYZ({
         x: 0,
         y: 0,
         z: 0,
-      },
+      }),
       focusDistance: -1,
     }
 

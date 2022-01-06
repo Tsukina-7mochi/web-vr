@@ -13,6 +13,8 @@ interface rotation {
   z: number,
 }
 
+type rotMatrix = [[number, number, number], [number, number, number], [number, number, number]];
+
 interface color {
   r: number,
   g: number,
@@ -35,4 +37,5 @@ export type {
   rotation,
   color,
   line,
+  rotMatrix,
 }

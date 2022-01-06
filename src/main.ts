@@ -1,6 +1,7 @@
 import './style.scss';
 import { color, coord, line } from './types';
 import Renderer from './renderer';
+import { calculateRotMatrixFromEulerAngleZXY, calculateRotMatrixFromFixedAngleXYZ } from './rotationUtils';
 
 const createCube = (centerPos: coord, edgeLength: number, color: color, width: number): line[] => {
   const len = edgeLength * centerPos.c / 2;
@@ -191,25 +192,41 @@ window.addEventListener('load', () => {
     render();
   });
   elRotX.addEventListener('input', () => {
-    renderer.camera.rotation.x = parseFloat(elRotX.value) * Math.PI;
+    renderer.camera.rotation = calculateRotMatrixFromFixedAngleXYZ({
+      x: parseFloat(elRotX.value) * Math.PI,
+      y: parseFloat(elRotY.value) * Math.PI,
+      z: parseFloat(elRotZ.value) * Math.PI
+    });
     render();
   });
   elRotY.addEventListener('input', () => {
-    renderer.camera.rotation.y = parseFloat(elRotY.value) * Math.PI;
+    renderer.camera.rotation = calculateRotMatrixFromFixedAngleXYZ({
+      x: parseFloat(elRotX.value) * Math.PI,
+      y: parseFloat(elRotY.value) * Math.PI,
+      z: parseFloat(elRotZ.value) * Math.PI
+    });
     render();
   });
   elRotZ.addEventListener('input', () => {
-    renderer.camera.rotation.z = parseFloat(elRotZ.value) * Math.PI;
+    renderer.camera.rotation = calculateRotMatrixFromFixedAngleXYZ({
+      x: parseFloat(elRotX.value) * Math.PI,
+      y: parseFloat(elRotY.value) * Math.PI,
+      z: parseFloat(elRotZ.value) * Math.PI
+    });
     render();
   });
 
   // デバイスの姿勢の検出
+  const elUseAbsolute = document.querySelector<HTMLInputElement>('#device_orientation_use_absolute') ;
   const elDeviceOrientationAvailable = document.querySelector<HTMLDivElement>('#device_orientation_available');
   const elDeviceOrientationDetected = document.querySelector<HTMLDivElement>('#device_orientation_detected');
   const elDeviceOrientationAlpha = document.querySelector<HTMLTableCellElement>('#device_orientation_alpha');
   const elDeviceOrientationBeta  = document.querySelector<HTMLTableCellElement>('#device_orientation_beta');
   const elDeviceOrientationGamma = document.querySelector<HTMLTableCellElement>('#device_orientation_gamma');
 
+  if(elUseAbsolute === null) {
+    throw Error('elUseAbsolute is null');
+  }
   if(elDeviceOrientationAvailable === null) {
     throw Error('elDeviceOrientationAvailable is null');
   }
@@ -226,25 +243,42 @@ window.addEventListener('load', () => {
     throw Error('elDeviceOrientationGamma is null');
   }
 
-  if(window.DeviceOrientationEvent) {
-    elDeviceOrientationAvailable.textContent = 'The device orientation is available.';
-  } else {
+  if(!window.DeviceOrientationEvent) {
     elDeviceOrientationAvailable.textContent = 'The device orientation is not available.';
-  }
+  } else {
+    elDeviceOrientationAvailable.textContent = 'The device orientation is available.';
 
-  window.addEventListener('deviceorientation', (e) => {
-    elDeviceOrientationDetected.textContent = 'The device orientation event detected';
-    elDeviceOrientationAlpha.textContent = '' + e.alpha;
-    elDeviceOrientationBeta. textContent = '' + e.beta;
-    elDeviceOrientationGamma.textContent = '' + e.gamma;
 
-    if(e.absolute) {
-      // そのまま使う
-    } else {
-      // 変換
+    window.addEventListener('deviceorientation', (e) => {
+      const useAbsoluteAngle = elUseAbsolute.checked;
+      elDeviceOrientationDetected.textContent = 'The device orientation event detected' + (e.absolute ? '(absolute)' : '(relative)');
+      elDeviceOrientationAlpha.textContent = '' + e.alpha;
+      elDeviceOrientationBeta. textContent = '' + e.beta;
+      elDeviceOrientationGamma.textContent = '' + e.gamma;
+
       if(typeof(e.alpha) === 'number' && typeof(e.beta) === 'number' && typeof(e.gamma) === 'number') {
-        //
+        const alpha = e.alpha / 180 * Math.PI;
+        const beta  = (e.beta - 90)  / 180 * Math.PI;
+        const gamma = e.gamma / 180 * Math.PI;
+
+        if(useAbsoluteAngle) {
+          renderer.camera.rotation = calculateRotMatrixFromFixedAngleXYZ({
+            x: -beta,
+            y: -gamma,
+            z: -alpha * (beta >= 0 ? 1 : -1)
+          });
+        } else {
+          renderer.camera.rotation = calculateRotMatrixFromEulerAngleZXY({
+            x: beta,
+            y: -gamma,
+            z: -alpha * (beta >= 0 ? 1 : -1)
+          });
+        }
+
+        render();
+
+        console.log(e);
       }
-    }
-  });
+    });
+  }
 });
