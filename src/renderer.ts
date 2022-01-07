@@ -37,7 +37,7 @@ const calculateBoundaryIntersectionZ = (p1: coord, p2: coord, infiniteDividerThr
     // p1が無限遠点
     const t = - p2.z / p1.z;
 
-    console.log('t: ', t);
+    // console.log('t: ', t);
 
     return {
       x: p2.x + p1.x * t,
@@ -127,10 +127,10 @@ class Renderer {
     // 座標系を並進
     ctx.setTransform(1, 0, 0, -1, this.screen.width / 2, this.screen.height / 2);
 
-    console.log('cam: ', this.camera);
+    // console.log('cam: ', this.camera);
 
     for(const obj of objects) {
-      console.log(obj);
+      // console.log(obj);
 
       if(obj.type === 'line') {
         ctx.strokeStyle = `rgba(${obj.color.r}, ${obj.color.g}, ${obj.color.b}, ${obj.color.a})`;
@@ -139,7 +139,7 @@ class Renderer {
         let startCamCoord = transformToCamCoord(obj.start, this.camera.coord, this.camera.rotation);
         let endCamCoord   = transformToCamCoord(obj.end,   this.camera.coord, this.camera.rotation);
 
-        console.log('transformed: ', startCamCoord, endCamCoord);
+        // console.log('transformed: ', startCamCoord, endCamCoord);
 
         if(startCamCoord.c < 0) {
           startCamCoord.x *= -1;
@@ -182,12 +182,12 @@ class Renderer {
           }
         }
 
-        console.log('intersected: ', startCamCoord, endCamCoord);
+        // console.log('intersected: ', startCamCoord, endCamCoord);
 
         const projectedStart = projectCoord(startCamCoord, this.camera.focusDistance);
         const projectedEnd = projectCoord(endCamCoord, this.camera.focusDistance);
 
-        console.log('projected: ', projectedStart, projectedEnd);
+        // console.log('projected: ', projectedStart, projectedEnd);
 
         // 斉次座標をユークリッド座標に変換
         // スクリーン上の点が無限遠とみなされるとき、その向きのスクリーン外の有限座標の点に変更
@@ -209,7 +209,7 @@ class Renderer {
           end.y = projectedEnd.y / projectedEnd.c;
         }
 
-        console.log('screen: ', start, end);
+        // console.log('screen: ', start, end);
 
         ctx.beginPath();
         ctx.moveTo(start.x, start.y);

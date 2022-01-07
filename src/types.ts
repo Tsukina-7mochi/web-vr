@@ -15,6 +15,13 @@ interface rotation {
 
 type rotMatrix = [[number, number, number], [number, number, number], [number, number, number]];
 
+interface quaternion {
+  x: number,
+  y: number,
+  z: number,
+  w: number
+}
+
 interface color {
   r: number,
   g: number,
@@ -38,4 +45,5 @@ export type {
   color,
   line,
   rotMatrix,
+  quaternion
 }

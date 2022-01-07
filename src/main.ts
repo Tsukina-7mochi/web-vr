@@ -1,7 +1,7 @@
 import './style.scss';
 import { color, coord, line } from './types';
 import Renderer from './renderer';
-import { calculateRotMatrixFromEulerAngleZXY, calculateRotMatrixFromFixedAngleXYZ } from './rotationUtils';
+import { calculateRotMatrixFromEulerAngleYXZ, calculateRotMatrixFromEulerAngleZXY, calculateRotMatrixFromFixedAngleXYZ, composeRotMatrix } from './rotationUtils';
 
 const createCube = (centerPos: coord, edgeLength: number, color: color, width: number): line[] => {
   const len = edgeLength * centerPos.c / 2;
@@ -137,8 +137,8 @@ window.addEventListener('load', () => {
   }
   const renderer = new Renderer(outputScreen, 720, 480);
 
-  console.log(worldGrid);
-  console.log(cube);
+  // console.log(worldGrid);
+  // console.log(cube);
 
   renderer.camera.coord.y = 10;
   renderer.camera.coord.z = 0;
@@ -258,7 +258,7 @@ window.addEventListener('load', () => {
 
       if(typeof(e.alpha) === 'number' && typeof(e.beta) === 'number' && typeof(e.gamma) === 'number') {
         const alpha = e.alpha / 180 * Math.PI;
-        const beta  = (e.beta - 90)  / 180 * Math.PI;
+        const beta  = e.beta  / 180 * Math.PI;
         const gamma = e.gamma / 180 * Math.PI;
 
         if(useAbsoluteAngle) {
@@ -270,14 +270,23 @@ window.addEventListener('load', () => {
         } else {
           renderer.camera.rotation = calculateRotMatrixFromEulerAngleZXY({
             x: beta,
-            y: -gamma,
+            y: gamma,
             z: -alpha * (beta >= 0 ? 1 : -1)
           });
+          // renderer.camera.rotation = composeRotMatrix(
+          //   calculateRotMatrixFromFixedAngleXYZ({
+          //     x: Math.PI / 2,
+          //     y: 0,
+          //     z: 0
+          //   }),
+          //   calculateRotMatrixFromEulerAngleZXY({
+          //     x: -beta,
+          //     y: -gamma,
+          //     z: -alpha * (beta >= 0 ? 1 : -1)
+          //   }));
         }
 
         render();
-
-        console.log(e);
       }
     });
   }
