@@ -264,14 +264,14 @@ window.addEventListener('load', () => {
         if(useAbsoluteAngle) {
           renderer.camera.rotation = calculateRotMatrixFromFixedAngleXYZ({
             x: -beta,
-            y: -gamma,
-            z: -alpha * (beta >= 0 ? 1 : -1)
+            y: -alpha * (beta >= 0 ? 1 : -1),
+            z: -gamma,
           });
         } else {
           renderer.camera.rotation = calculateRotMatrixFromEulerAngleZXY({
             x: beta,
-            y: gamma,
-            z: -alpha * (beta >= 0 ? 1 : -1)
+            y: -alpha * (beta >= 0 ? 1 : -1),
+            z: gamma,
           });
           // renderer.camera.rotation = composeRotMatrix(
           //   calculateRotMatrixFromFixedAngleXYZ({
